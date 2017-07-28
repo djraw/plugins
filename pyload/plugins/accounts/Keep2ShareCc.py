@@ -10,7 +10,7 @@ from ..internal.misc import set_cookie
 class Keep2ShareCc(Account):
     __name__ = "Keep2ShareCc"
     __type__ = "account"
-    __version__ = "0.13"
+    __version__ = "0.14"
     __status__ = "testing"
 
     __description__ = """Keep2Share.cc account plugin"""
@@ -18,8 +18,8 @@ class Keep2ShareCc(Account):
     __authors__ = [("aeronaut", "aeronaut@pianoguy.de"),
                    ("Walter Purcaro", "vuolter@gmail.com")]
 
-    VALID_UNTIL_PATTERN = r'Premium expires:\s*<b>(.+?)<'
-    TRAFFIC_LEFT_PATTERN = r'Available traffic \(today\):\s*<b><a href="/user/statistic.html">(.+?)<'
+    VALID_UNTIL_PATTERN = r'Premium expires:\s*</span>\s*<strong class="nowrap-item">\s*(.+?)\s*<'
+    TRAFFIC_LEFT_PATTERN = r'Traffic left today</span>\s*<strong class="total-info">\s*<a class="link-hover" href="/user/statistic.html">(.+?)<'
 
     LOGIN_FAIL_PATTERN = r'Please fix the following input errors'
 
@@ -28,7 +28,7 @@ class Keep2ShareCc(Account):
         trafficleft = -1
         premium = False
 
-        html = self.load("http://keep2share.cc/site/profile.html")
+        html = self.load("https://k2s.cc/site/profile.html")
 
         m = re.search(self.VALID_UNTIL_PATTERN, html)
         if m is not None:
@@ -59,12 +59,12 @@ class Keep2ShareCc(Account):
                     self.log_error(e, trace=True)
 
         return {'validuntil': validuntil,
-                'trafficleft': trafficleft, 'premium': premium}
+                'trafficleft': -1, 'premium': premium}
 
     def signin(self, user, password, data):
-        set_cookie(self.req.cj, "keep2share.cc", "lang", "en")
+        set_cookie(self.req.cj, "k2s.cc", "lang", "en")
 
-        html = self.load("https://keep2share.cc/login.html",
+        html = self.load("https://k2s.cc/login.html",
                          post={'LoginForm[username]': user,
                                'LoginForm[password]': password,
                                'LoginForm[rememberMe]': 1,
