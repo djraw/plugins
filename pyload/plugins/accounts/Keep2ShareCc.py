@@ -19,7 +19,7 @@ class Keep2ShareCc(Account):
                    ("Walter Purcaro", "vuolter@gmail.com")]
 
     VALID_UNTIL_PATTERN = r'Premium expires:\s*</span>\s*<strong class="nowrap-item">\s*(.+?)\s*<'
-    TRAFFIC_LEFT_PATTERN = r'Traffic left today</span>\s*<strong class="total-info">\s*<a class="link-hover" href="/user/statistic.html">(.+?)<'
+    TRAFFIC_LEFT_PATTERN = r'Traffic left today</span>\s*<strong class="total-info">\s*<a class="link-hover" href="/user/statistic.html">(?P<S>[\d.,]+) (?P<U>[\w^_]+)'
 
     LOGIN_FAIL_PATTERN = r'Please fix the following input errors'
 
@@ -53,13 +53,16 @@ class Keep2ShareCc(Account):
             m = re.search(self.TRAFFIC_LEFT_PATTERN, html)
             if m is not None:
                 try:
-                    trafficleft = self.parse_traffic(m.group(1))
+                    traffic = m.groupdict()
+                    size = traffic['S']
+                    unit = traffic['U'].lower()
+                    trafficleft = self.parse_traffic(size, unit)
 
                 except Exception, e:
                     self.log_error(e, trace=True)
 
         return {'validuntil': validuntil,
-                'trafficleft': -1, 'premium': premium}
+                'trafficleft': trafficleft, 'premium': premium}
 
     def signin(self, user, password, data):
         set_cookie(self.req.cj, "k2s.cc", "lang", "en")
