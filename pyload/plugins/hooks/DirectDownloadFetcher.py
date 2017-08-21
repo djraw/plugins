@@ -55,7 +55,7 @@ class DirectDownloadFetcher(Hook):
                 links = str(item['summary'].replace("\n","").replace("<br /><br />","<br />")).split("<br />")      # Get all links (first element is the name)
                 title = links.pop(0).strip()                                                                        # strip first item to leave links only
                 self.core.log.info("DDFetcher: New Episode found: %s" % (title))
-                title = str(item['releasename'])                                                                    # set releasename as package title 
+                title = str(item['releasename'].strip())                                                            # set releasename as package title 
                 links = filter (lambda x:x.startswith("http") , links)                                           # remove all non-links (Empty lines, and whatnot)
                 if (len(self.filterLinks(links)) > 0) :
                     self.core.api.addPackage(title.encode("utf-8"), self.filterLinks(links), 1 if self.getConfig("queue") else 0) 
